@@ -1,18 +1,18 @@
 import pino from 'pino';
-import pinoPretty, { PrettyOptions } from 'pino-pretty';
-import { name } from '../../package.json';
-import { getENV } from '@/configs';
+import pinoPretty from 'pino-pretty';
+import packageData from '../../package.json' with { type: 'json' };
+import getENV from './env.js';
 
 interface MessageFormatLog {
-    level: number
-    time: number
-    pid: number
-    hostname: string
-    msg: string
+	level: number
+	time: number
+	pid: number
+	hostname: string
+	msg: string
 }
 
 // export const traceLogger = pino({
-//     name: `${name}:api`,
+//     name: `${packageData.name}:api`,
 //     level: getENV('TRACE_LOG_LEVEL') || getENV('LOG_LEVEL') || 'silent',
 //     transport: {
 //         target: 'pino-pretty',
@@ -27,19 +27,19 @@ interface MessageFormatLog {
 export const traceLogger = pino(pinoPretty({
 	colorize: true,
 	translateTime: 'SYS:yyyy-mm-dd HH:MM:ss.l',
-	messageFormat: ((log: Record<string, unknown>, messageKey: string) => {
+	messageFormat: (log: Record<string, unknown>, messageKey: string) => {
 		const data = log as unknown as MessageFormatLog;
 		const message = data[messageKey as 'msg'];
 
-		return `[${name}] ${message}\n`;
-	}) as PrettyOptions['messageFormat'],
+		return `[${packageData.name}] ${message}\n`;
+	},
 	ignore: 'pid,hostname'
 }));
 
-traceLogger.level = getENV('TRACE_LOG_LEVEL') || getENV('LOG_LEVEL') || 'silent';
+traceLogger.level = getENV('LOG_LEVEL') || 'silent';
 
 // export const logger = pino({
-//     name: `${name}:develop`,
+//     name: `${packageData.name}:develop`,
 //     level: getENV('DEV_LOG_LEVEL') || getENV('LOG_LEVEL') || 'silent',
 //     transport: {
 //         target: 'pino-pretty',
@@ -54,19 +54,19 @@ traceLogger.level = getENV('TRACE_LOG_LEVEL') || getENV('LOG_LEVEL') || 'silent'
 export const logger = pino(pinoPretty({
 	colorize: true,
 	translateTime: 'SYS:yyyy-mm-dd HH:MM:ss.l',
-	messageFormat: ((log: Record<string, unknown>, messageKey: string) => {
+	messageFormat: (log: Record<string, unknown>, messageKey: string) => {
 		const data = log as unknown as MessageFormatLog;
 		const message = data[messageKey as 'msg'];
 
-		return `[${name}] [develop:${data.pid}] ${message}\n`;
-	}) as PrettyOptions['messageFormat'],
+		return `[${packageData.name}] [develop:${data.pid}] ${message}\n`;
+	},
 	ignore: 'pid,hostname'
 }));
 
-logger.level = getENV('DEV_LOG_LEVEL') || getENV('LOG_LEVEL') || 'silent';
+logger.level = getENV('LOG_LEVEL') || 'silent';
 
 // export const systemLogger = pino({
-//     name,
+//     name: `${packageData.name}:system`,
 //     level: 'trace',
 //     transport: {
 //         target: 'pino-pretty',
@@ -81,12 +81,12 @@ logger.level = getENV('DEV_LOG_LEVEL') || getENV('LOG_LEVEL') || 'silent';
 export const systemLogger = pino(pinoPretty({
 	colorize: true,
 	translateTime: 'SYS:yyyy-mm-dd HH:MM:ss.l',
-	messageFormat: ((log: Record<string, unknown>, messageKey: string) => {
+	messageFormat: (log: Record<string, unknown>, messageKey: string) => {
 		const data = log as unknown as MessageFormatLog;
 		const message = data[messageKey as 'msg'];
 
-		return `[${name}] [system:${data.hostname}] ${message}\n`;
-	}) as PrettyOptions['messageFormat'],
+		return `[${packageData.name}] [system:${data.hostname}] ${message}\n`;
+	},
 	ignore: 'pid,hostname'
 }));
 

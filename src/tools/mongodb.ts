@@ -1,12 +1,13 @@
 import mongoose from 'mongoose';
-import { getENV, systemLogger } from '@/configs';
+import { getEnv, systemLogger } from '../configs/index.js';
+import { protectedUrl } from '../utils/index.js';
 
 const RECONNET_TIME = 5000;
 const mongoconnect = async () => {
-	const mongodbAddress = getENV('MONGO_URL');
+	const mongodbAddress = getEnv('MONGO_URL');
 
 	if (!mongodbAddress) {
-		return systemLogger.error(`mongodb connect address is required but get ${mongodbAddress}`);
+		return systemLogger.error(`mongodb connect address is required but get "${mongodbAddress}"`);
 	}
 	try {
 		await mongoose.connect(mongodbAddress);
@@ -18,7 +19,7 @@ const mongoconnect = async () => {
 	}
 };
 
-export default new class MongoDB {
+export default new (class MongoDb {
 	constructor() {
 		if (!this.isUseful) {
 			return;
@@ -28,27 +29,38 @@ export default new class MongoDB {
 	}
 
 	private async init() {
+		// 初始化操作
 		this.server.once('connected', () => {
-			systemLogger.info(`mongodb connected on ${getENV('MONGO_URL')} success and ready to use.`);
+			// 连接成功
+			systemLogger.info(`mongodb connected on ${protectedUrl(getEnv('MONGO_URL'))} success and ready to use.`);
 		});
 
 		this.server.on('disconnected', () => {
-			systemLogger.fatal(`disconnected! connection is break off. it will be retried in ${RECONNET_TIME} ms after every reconnect until success unless process exit.`);
+			// 连接失败或中断
+			systemLogger.fatal(
+				`disconnected! connection is break off. it will be retried in ${RECONNET_TIME} ms after every reconnect until success unless process exit.`
+			);
 		});
 
 		this.server.on('reconnected', () => {
-			systemLogger.info(`reconnect on ${getENV('MONGO_URL')} success and ready to use.`);
+			// 重新连接成功
+			systemLogger.info(`reconnect on ${protectedUrl(getEnv('MONGO_URL'))} success and ready to use.`);
 		});
 		return await mongoconnect();
 	}
 
+	/**
+	 * 系统是否采用mongodb作为数据库
+	 * @readonly
+	 * @private
+	 */
 	private get isUseful() {
-		return !!getENV('MONGO_URL');
+		return !!getEnv('MONGO_URL');
 	}
 
 	public get server() {
 		if (!this.isUseful) {
-			systemLogger.warn(`require to use ${getENV('MONGO_URL')}, but call mongodb! mongodb is not available!`);
+			systemLogger.warn('mongodb is not available!');
 		}
 		return mongoose.connection;
 	}
@@ -58,7 +70,7 @@ export default new class MongoDB {
 	}
 
 	public get isOK() {
-		return !this.isUseful || this.isUseful && this.server.readyState === 1;
+		return !this.isUseful || (this.isUseful && this.server.readyState === 1);
 	}
 
 	public async close(): Promise<void> {
@@ -66,4 +78,4 @@ export default new class MongoDB {
 			await this.server.close();
 		}
 	}
-};
+})();

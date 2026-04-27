@@ -1,2 +1,1 @@
-import './alias';
-import './exception';
+import './exception.js';

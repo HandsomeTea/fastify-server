@@ -1,3 +1,3 @@
-import './error';
-import './request';
-import './response';
+import './error.js';
+import './request.js';
+import './response.js';

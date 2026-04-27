@@ -13,12 +13,12 @@ export const HttpErrorType = {
 	JOB_NOT_FOUND: 404
 } as const;
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+ 
 // @ts-ignore
 export const ErrorCode: { [K in keyof typeof HttpErrorType]: K } = {} as const;
 
 for (const key in HttpErrorType) {
-	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+	 
 	// @ts-ignore
 	ErrorCode[key] = key;
 }

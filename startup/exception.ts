@@ -1,7 +1,7 @@
-import { HttpErrorType } from '@/configs/errorCode';
-import { name } from '../package.json';
+import { HttpErrorType } from '../src/configs/errorCode.js';
+import packageData from '../package.json' with { type: 'json' };
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+ 
 // @ts-ignore
 global.Exception = class Exception extends Error {
 	public message: string;
@@ -18,16 +18,16 @@ global.Exception = class Exception extends Error {
 			this.message = error;
 		} else {
 			this.message = error?.message || 'inner server error!';
-			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			 
 			// @ts-ignore
 			this.code = error.code;
-			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			 
 			// @ts-ignore
 			this.status = error.status;
-			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			 
 			// @ts-ignore
 			this.reason = error.reason;
-			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			 
 			// @ts-ignore
 			this.source = Array.from(error.source || '');
 		}
@@ -43,7 +43,7 @@ global.Exception = class Exception extends Error {
 
 		// status
 		if (!this.status) {
-			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			 
 			// @ts-ignore
 			this.status = HttpErrorType[this.code];
 
@@ -64,8 +64,8 @@ global.Exception = class Exception extends Error {
 		}
 
 		// source
-		if (name && !this.source.includes(name)) {
-			this.source.push(name);
+		if (packageData.name && !this.source.includes(packageData.name)) {
+			this.source.push(packageData.name);
 		}
 	}
 

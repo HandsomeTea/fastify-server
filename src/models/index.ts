@@ -1,4 +1,4 @@
-import Tests from './test';
+import Tests from './test.js';
 
 export {
 	Tests

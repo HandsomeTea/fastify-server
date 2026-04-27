@@ -1,8 +1,8 @@
-import { app } from '@/app';
-import { logger } from '@/configs';
+import { app } from '../app.js';
+import { logger } from '../configs/index.js';
 
 app.addHook('onError', async (_request, reply, error) => {
-	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+	 
 	// @ts-ignore
 	reply.e = error;
 	logger.error(error);

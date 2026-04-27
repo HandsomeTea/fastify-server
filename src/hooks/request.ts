@@ -1,18 +1,8 @@
-import { app } from '@/app';
-import { traceLogger } from '@/configs';
+import { randomBytes } from 'node:crypto';
+import { app } from '../app.js';
+import { traceLogger } from '../configs/index.js';
 
-const traceId = (): string => {
-	const digits = '0123456789abcdef';
-
-	let _trace = '';
-
-	for (let i = 0; i < 16; i += 1) {
-		const rand = Math.floor(Math.random() * digits.length);
-
-		_trace += digits[rand];
-	}
-	return _trace;
-};
+const traceId = (): string => randomBytes(8).toString('hex');
 
 app.setGenReqId((request) => {
 	if (!request.headers['x-b3-spanid']) {
