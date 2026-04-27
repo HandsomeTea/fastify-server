@@ -1,7 +1,7 @@
-import { HttpErrorType } from '../src/configs/errorCode.js';
-import packageData from '../package.json' with { type: 'json' };
+import { HttpErrorType } from '../configs/errorCode.js';
+import packageData from '../../package.json' with { type: 'json' };
 
- 
+
 // @ts-ignore
 global.Exception = class Exception extends Error {
 	public message: string;
@@ -18,16 +18,16 @@ global.Exception = class Exception extends Error {
 			this.message = error;
 		} else {
 			this.message = error?.message || 'inner server error!';
-			 
+
 			// @ts-ignore
 			this.code = error.code;
-			 
+
 			// @ts-ignore
 			this.status = error.status;
-			 
+
 			// @ts-ignore
 			this.reason = error.reason;
-			 
+
 			// @ts-ignore
 			this.source = Array.from(error.source || '');
 		}
@@ -43,7 +43,7 @@ global.Exception = class Exception extends Error {
 
 		// status
 		if (!this.status) {
-			 
+
 			// @ts-ignore
 			this.status = HttpErrorType[this.code];
 

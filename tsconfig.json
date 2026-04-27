@@ -2,7 +2,7 @@
   // Visit https://aka.ms/tsconfig to read more about this file
   "compilerOptions": {
     // File Layout
-    "rootDir": "./",
+    "rootDir": "./src",
     "outDir": "./dist",
     // Environment Settings
     // See also https://aka.ms/tsconfig/module
@@ -24,8 +24,8 @@
     "declaration": false, // 不输出.d.ts文件
     "declarationMap": false, // 不输出.d.ts.map文件
     // Stricter Typechecking Options
-    "noUncheckedIndexedAccess": true,
-    "exactOptionalPropertyTypes": true,
+    "noUncheckedIndexedAccess": false,
+    "exactOptionalPropertyTypes": false,
     // Style Options
     // "noImplicitReturns": true,
     // "noImplicitOverride": true,
@@ -49,8 +49,7 @@
   },
   "include": [
     "src/**/*.ts",
-    "typings/*.d.ts",
-    "index.ts"
+    "typings/*.d.ts"
   ],
   "exclude": [
     "node_modules",

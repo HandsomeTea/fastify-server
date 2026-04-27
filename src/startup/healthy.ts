@@ -1,5 +1,5 @@
-import mongodb from '../src/tools/mongodb.js';
-import { systemLogger } from '../src/configs/index.js';
+import mongodb from '..//tools/mongodb.js';
+import { systemLogger } from '../configs/index.js';
 
 /**
  * 健康检查

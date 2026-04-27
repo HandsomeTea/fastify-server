@@ -1,13 +1,13 @@
-import { app } from '../app.js';
+import { app } from '../routes/app.js';
 import { traceLogger } from '../configs/index.js';
 
 app.addHook('onSend', async (request, reply, payload) => {
 	let errPyload = null;
 
-	 
+
 	// @ts-ignore
 	if (reply.e) {
-		 
+
 		// @ts-ignore
 		const { code, message, status, reason, source } = reply.e as ExceptionInstance;
 

@@ -1,5 +1,5 @@
 import { randomBytes } from 'node:crypto';
-import { app } from '../app.js';
+import { app } from '../routes/app.js';
 import { traceLogger } from '../configs/index.js';
 
 const traceId = (): string => randomBytes(8).toString('hex');
