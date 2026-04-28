@@ -1,93 +1,71 @@
+import { randomBytes } from 'node:crypto';
 import pino from 'pino';
-import pinoPretty from 'pino-pretty';
 import packageData from '../../package.json' with { type: 'json' };
-import getENV from './env.js';
+import getEnv from './env.js';
 
-interface MessageFormatLog {
-	level: number
-	time: number
-	pid: number
-	hostname: string
-	msg: string
-}
-
-// export const traceLogger = pino({
-//     name: `${packageData.name}:api`,
-//     level: getENV('TRACE_LOG_LEVEL') || getENV('LOG_LEVEL') || 'silent',
-//     transport: {
-//         target: 'pino-pretty',
-//         options: {
-//             colorize: true,
-//             translateTime: 'SYS:yyyy-mm-dd HH:MM:ss.l',
-//             ignore: 'pid,hostname'
-//         }
-//     }
-// });
-
-export const traceLogger = pino(pinoPretty({
-	colorize: true,
-	translateTime: 'SYS:yyyy-mm-dd HH:MM:ss.l',
-	messageFormat: (log: Record<string, unknown>, messageKey: string) => {
-		const data = log as unknown as MessageFormatLog;
-		const message = data[messageKey as 'msg'];
-
-		return `[${packageData.name}] ${message}\n`;
+const serverName = packageData.name;
+const auditLogger = pino(
+	{
+		level: getEnv('LOG_LEVEL') || 'info',
+		base: { app: serverName.toUpperCase() },
+		timestamp: pino.stdTimeFunctions.isoTime
 	},
-	ignore: 'pid,hostname'
-}));
-
-traceLogger.level = getENV('LOG_LEVEL') || 'silent';
-
-// export const logger = pino({
-//     name: `${packageData.name}:develop`,
-//     level: getENV('DEV_LOG_LEVEL') || getENV('LOG_LEVEL') || 'silent',
-//     transport: {
-//         target: 'pino-pretty',
-//         options: {
-//             colorize: true,
-//             translateTime: 'SYS:yyyy-mm-dd HH:MM:ss.l',
-//             ignore: 'hostname'
-//         }
-//     }
-// });
-
-export const logger = pino(pinoPretty({
-	colorize: true,
-	translateTime: 'SYS:yyyy-mm-dd HH:MM:ss.l',
-	messageFormat: (log: Record<string, unknown>, messageKey: string) => {
-		const data = log as unknown as MessageFormatLog;
-		const message = data[messageKey as 'msg'];
-
-		return `[${packageData.name}] [develop:${data.pid}] ${message}\n`;
+	pino.transport({
+		targets: [
+			{
+				target: 'pino-roll',
+				level: 'info',
+				options: {
+					file: 'public/logs/audit.log',
+					frequency: 'daily',
+					mkdir: true,
+					translateTime: 'SYS:yyyy-mm-dd HH:MM:ss.l o'
+				}
+			}
+		]
+	})
+);
+// 打印在控制台终端的Logger
+export const terminalLogger = pino(
+	{
+		level: getEnv('LOG_LEVEL') || 'info',
+		base: { app: serverName.toUpperCase() },
+		timestamp: pino.stdTimeFunctions.isoTime
 	},
-	ignore: 'pid,hostname'
-}));
+	pino.transport({
+		targets: [
+			{
+				target: 'pino-pretty',
+				level: getEnv('LOG_LEVEL') || 'debug',
+				options: { colorize: true, translateTime: 'SYS:yyyy-mm-dd HH:MM:ss.l o' }
+			}
+		]
+	})
+);
 
-logger.level = getENV('LOG_LEVEL') || 'silent';
+// 3. 封装类似原来的 API 接口
+export const log = (module = 'HTTP_REQUEST') => terminalLogger.child({ module: module.toUpperCase() });
 
-// export const systemLogger = pino({
-//     name: `${packageData.name}:system`,
-//     level: 'trace',
-//     transport: {
-//         target: 'pino-pretty',
-//         options: {
-//             colorize: true,
-//             translateTime: 'SYS:yyyy-mm-dd HH:MM:ss.l',
-//             ignore: 'pid'
-//         }
-//     }
-// });
+export const system = (module: string) => terminalLogger.child({ module: `SYSTEM:${module.toUpperCase()}` });
 
-export const systemLogger = pino(pinoPretty({
-	colorize: true,
-	translateTime: 'SYS:yyyy-mm-dd HH:MM:ss.l',
-	messageFormat: (log: Record<string, unknown>, messageKey: string) => {
-		const data = log as unknown as MessageFormatLog;
-		const message = data[messageKey as 'msg'];
+export const audit = (module = 'AUDIT') => auditLogger.child({ module: module.toUpperCase(), type: 'audit' });
 
-		return `[${packageData.name}] [system:${data.hostname}] ${message}\n`;
+export const trace = (
+	data: {
+		traceId: string;
+		spanId: string;
+		parentSpanId: string;
+		query?: unknown
+		body?: unknown
+		header?: Record<string, unknown>;
+		response?: unknown;
 	},
-	ignore: 'pid,hostname'
-}));
+	module = serverName
+) => {
+	return terminalLogger.child({
+		module: (module || 'default').toUpperCase(),
+		...data
+	});
+};
 
-systemLogger.level = 'trace';
+export const generateTraceId = (): string => randomBytes(8).toString('hex');

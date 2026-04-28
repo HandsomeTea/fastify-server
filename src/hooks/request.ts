@@ -1,31 +1,42 @@
-import { randomBytes } from 'node:crypto';
 import { app } from '../routes/app.js';
-import { traceLogger } from '../configs/index.js';
-
-const traceId = (): string => randomBytes(8).toString('hex');
-
-app.setGenReqId((request) => {
-	if (!request.headers['x-b3-spanid']) {
-		request.headers['x-b3-spanid'] = traceId();
-	}
-	return (request.headers['x-request-id'] || request.headers['x-b3-spanid']) as string;
-});
+import { generateTraceId, trace } from '../configs/index.js';
+import { contextStorage, getContext, type RequestContext } from './context.js';
 
 app.addHook('onRequest', async request => {
 	if (!request.headers['x-b3-traceid']) {
-		request.headers['x-b3-traceid'] = traceId();
+		request.headers['x-b3-traceid'] = generateTraceId();
 	}
 	if (!request.headers['x-b3-parentspanid']) {
 		request.headers['x-b3-parentspanid'] = '';
 	}
 	if (!request.headers['x-b3-spanid']) {
-		request.headers['x-b3-spanid'] = traceId();
+		request.headers['x-b3-spanid'] = generateTraceId();
 	}
-	traceLogger.info(`[http-request] ${request.method}:${request.url}\n${JSON.stringify({
-		reqId: request.id,
-		headers: request.headers,
-		query: request.query,
-		body: request.body,
-		params: request.params
-	}, null, '   ')}`);
+	const context: RequestContext = {
+		userId: request.headers['x-user-id']?.toString() || '',
+		traceId: request.headers['x-b3-traceid'].toString() || generateTraceId(),
+		spanId: request.headers['x-b3-spanid'].toString() || generateTraceId(),
+		parentSpanId: request.headers['x-b3-parentspanid'].toString() || ''
+	};
+
+	contextStorage.run(context, () => {
+		const ctx = getContext();
+
+		if (ctx) {
+			trace(
+				{
+					traceId: ctx.traceId,
+					spanId: ctx.spanId,
+					parentSpanId: ctx.parentSpanId,
+					header: {
+						...request.headers,
+						...(request.headers.cookie ? { cookie: '******' } : {})
+					},
+					query: request.query || {},
+					body: request.body || {}
+				},
+				'HTTP-REQUEST'
+			).info(`[${request.method}] ${request.url}`);
+		}
+	});
 });

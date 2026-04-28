@@ -13,3 +13,10 @@ declare interface ExceptionConstructor {
 }
 
 declare const Exception: ExceptionConstructor;
+
+
+declare interface MongoField {
+    _id: string
+    createdAt: Date
+    updatedAt: Date
+}

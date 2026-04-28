@@ -1,9 +1,9 @@
 import { app } from '../routes/app.js';
-import { logger } from '../configs/index.js';
+import { log } from '../configs/index.js';
 
 app.addHook('onError', async (_request, reply, error) => {
 
 	// @ts-ignore
 	reply.e = error;
-	logger.error(error);
+	log('HTTP-ERROR').error(error);
 });

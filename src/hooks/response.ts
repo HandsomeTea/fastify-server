@@ -1,5 +1,6 @@
 import { app } from '../routes/app.js';
-import { traceLogger } from '../configs/index.js';
+import { trace } from '../configs/index.js';
+import { getContext } from './context.js';
 
 app.addHook('onSend', async (request, reply, payload) => {
 	let errPyload = null;
@@ -15,14 +16,19 @@ app.addHook('onSend', async (request, reply, payload) => {
 		errPyload = { code, message, reason, source };
 	}
 
-	traceLogger.info(`[http-response] ${request.method}:${request.url} =>\n${JSON.stringify({
-		reqId: request.id,
-		headers: request.headers,
-		query: request.query,
-		body: request.body,
-		params: request.params,
-		response: errPyload || JSON.parse(payload as string)
-	}, null, '   ')}`);
+	const ctx = getContext();
+
+	if (ctx) {
+		trace(
+			{
+				traceId: ctx.traceId,
+				spanId: ctx.spanId,
+				parentSpanId: ctx.parentSpanId,
+				response: errPyload || JSON.parse(payload as string)
+			},
+			'HTTP-RESPONSE'
+		).info(`[${request.method}] ${request.url} =>`);
+	}
 
 	if (errPyload) {
 		return JSON.stringify(errPyload);

@@ -1,5 +1,5 @@
 import type { SchemaDefinition, FilterQuery, UpdateQuery, QueryOptions, UpdateWithAggregationPipeline, SchemaDefinitionType, Model, SortOrder } from 'mongoose';
-import mongodb from '../tools/mongodb.js';
+import mongodb from '../../tools/mongose.js';
 
 export default class MongoBase<CM> {
 	protected collectionName: string;
@@ -58,13 +58,13 @@ export default class MongoBase<CM> {
 
 	async paging<K extends keyof CM>(query: FilterQuery<CM>, limit: number, skip: number, sort?: Record<K, 'asc' | 'desc' | 'ascending' | 'descending'>, options?: QueryOptions<CM>) {
 		return {
-			 
+
 			// @ts-ignore
 			list: await this.model.find(query, null, options).sort((() => {
 				const obj: { [key: string]: SortOrder } = {};
 
 				if (sort) {
-					 
+
 					// @ts-ignore
 					Object.keys(sort).filter(a => !!sort[a]).map(b => obj[b] = sort[b]);
 				}

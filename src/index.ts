@@ -1,13 +1,17 @@
+import crypto from 'node:crypto';
+
+process.env.INSTANCEID = crypto.randomBytes(24).toString('hex').substring(0, 24);
+global.isServerRunning = false;
 import './startup/index.js';
-import { getEnv, logger, systemLogger } from './configs/index.js';
+import { getEnv, system } from './configs/index.js';
 
 process.on('unhandledRejection', reason => {
-    systemLogger.fatal(reason);
+    system('Rejection').fatal(reason);
     // audit('SYSTEM').fatal(reason);
 });
 
 process.on('uncaughtException', reason => {
-    systemLogger.fatal(reason);
+    system('Exception').fatal(reason);
     // audit('SYSTEM').fatal(reason);
 });
 
@@ -16,7 +20,7 @@ process.on('SIGINT', () => {
 });
 
 process.on('exit', async () => {
-    logger.info('server connection will stop normally.');
+    system('exit').info('server connection will stop normally.');
 });
 
 import { app } from './routes/app.js';
@@ -24,7 +28,7 @@ import v1 from './routes/v1/index.js';
 import healthyCheck from './routes/healthy.js';
 
 app.register(healthyCheck);
-app.register(v1, { prefix: '/api/v1'/*, foo: 'foo-str'*/ });
+app.register(v1, { prefix: '/api/usermanager/v1' });
 
 
 import './hooks/index.js';
@@ -37,13 +41,12 @@ app.listen({
     host: '0.0.0.0'
 }, (err, address) => {
     if (err) {
-        return systemLogger.error(err);
+        return system('startup').error(err);
     }
     let check: NodeJS.Timeout | null = setInterval(async () => {
         if (!await isHealth()) {
             return;
         }
-        global.isServerRunning = true;
 
         if (process.send) {
             process.send('ready');
@@ -52,7 +55,7 @@ app.listen({
             clearInterval(check);
             check = null;
         }
-
-        systemLogger.info(`${packageData.name} running at ${address}.`);
+        global.isServerRunning = true;
+        system('startup').info(`${packageData.name} running at ${address}.`);
     }, 1000);
 });

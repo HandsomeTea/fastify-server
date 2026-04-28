@@ -24,8 +24,8 @@
     "declaration": false, // 不输出.d.ts文件
     "declarationMap": false, // 不输出.d.ts.map文件
     // Stricter Typechecking Options
-    "noUncheckedIndexedAccess": false,
-    "exactOptionalPropertyTypes": false,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
     // Style Options
     // "noImplicitReturns": true,
     // "noImplicitOverride": true,

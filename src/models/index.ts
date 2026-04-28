@@ -1,5 +1,1 @@
-import Tests from './test.js';
-
-export {
-	Tests
-};
+export { Users, type UserModel } from './mongoose/index.js';
