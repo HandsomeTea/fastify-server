@@ -1,4 +1,3 @@
-
 declare interface ExceptionInstance {
     message: string;
     source: Array<string>;

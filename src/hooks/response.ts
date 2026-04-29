@@ -1,8 +1,9 @@
-import { app } from '../routes/app.js';
 import { trace } from '../configs/index.js';
 import { getContext } from './context.js';
+import type { onSendAsyncHookHandler } from 'fastify';
 
-app.addHook('onSend', async (request, reply, payload) => {
+
+export const responseHook: onSendAsyncHookHandler = async (request, reply, payload) => {
 	let errPyload = null;
 
 
@@ -34,4 +35,4 @@ app.addHook('onSend', async (request, reply, payload) => {
 		return JSON.stringify(errPyload);
 	}
 	return payload;
-});
+};

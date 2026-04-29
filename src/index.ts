@@ -24,15 +24,6 @@ process.on('exit', async () => {
 });
 
 import { app } from './routes/app.js';
-import v1 from './routes/v1/index.js';
-import healthyCheck from './routes/healthy.js';
-
-app.register(healthyCheck);
-app.register(v1, { prefix: '/api/usermanager/v1' });
-
-
-import './hooks/index.js';
-
 import { isHealth } from './startup/healthy.js';
 import packageData from '../package.json' with { type: 'json' };
 
