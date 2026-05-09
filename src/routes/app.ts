@@ -5,12 +5,9 @@ import Fastify from 'fastify';
  */
 export const app = Fastify({ logger: false });
 
-import { userLoginCheck } from '../middlewares/index.js';
+import { errorHook, requestHookPlugin, responseHook, userLoginCheck } from '../hooks/index.js';
 
 app.register(userLoginCheck);
-
-import { errorHook, requestHookPlugin, responseHook } from '../hooks/index.js';
-
 app.addHook('onError', errorHook);
 app.addHook('preHandler', async (request, reply) => await app.userLoginRequired(request, reply));
 app.register(requestHookPlugin);

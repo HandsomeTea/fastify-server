@@ -1,4 +1,4 @@
-import { log } from '../configs/index.js';
+import { log } from '../configs/logger.js';
 import type { onErrorAsyncHookHandler } from 'fastify';
 
 export const errorHook: onErrorAsyncHookHandler = async (_request, reply, error) => {

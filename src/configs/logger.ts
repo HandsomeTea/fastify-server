@@ -1,7 +1,7 @@
 import { randomBytes } from 'node:crypto';
 import pino from 'pino';
 import packageData from '../../package.json' with { type: 'json' };
-import getEnv from './env.js';
+import { getEnv } from './env.js';
 
 const serverName = packageData.name;
 const auditLogger = pino(

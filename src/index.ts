@@ -3,7 +3,8 @@ import crypto from 'node:crypto';
 process.env.INSTANCEID = crypto.randomBytes(24).toString('hex').substring(0, 24);
 global.isServerRunning = false;
 import './startup/index.js';
-import { getEnv, system } from './configs/index.js';
+import { getEnv } from './configs/env.js';
+import { system } from './configs/logger.js';
 
 process.on('unhandledRejection', reason => {
     system('Rejection').fatal(reason);

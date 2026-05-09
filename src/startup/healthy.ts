@@ -1,6 +1,6 @@
 // import mongodb from '../tools/mongose.js';
 import mongodb from '../tools/mongodb.js';
-import { system } from '../configs/index.js';
+import { system } from '../configs/logger.js';
 
 /**
  * 健康检查

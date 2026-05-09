@@ -8,17 +8,15 @@ export const HttpErrorType = {
 	UNAUTHORIZED: 401,
 	BE_LOGOUT: 401,
 	REQUEST_TIMEOUT: 408,
-	TOO_MANY_REQUESTS: 429,
-	PACKAGE_NOT_FOUND: 404,
-	JOB_NOT_FOUND: 404
+	TOO_MANY_REQUESTS: 429
 } as const;
 
- 
+
 // @ts-ignore
 export const ErrorCode: { [K in keyof typeof HttpErrorType]: K } = {} as const;
 
 for (const key in HttpErrorType) {
-	 
+
 	// @ts-ignore
 	ErrorCode[key] = key;
 }

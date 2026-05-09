@@ -1,4 +1,4 @@
-import { trace } from '../configs/index.js';
+import { trace } from '../configs/logger.js';
 import { getContext } from './context.js';
 import type { onSendAsyncHookHandler } from 'fastify';
 

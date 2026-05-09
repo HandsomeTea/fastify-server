@@ -47,7 +47,7 @@ export default class MongoBase<CM extends Record<string, any>> {
 	}
 
 	async find(query?: Filter<CM>, options?: FindOptions) {
-		return await this.collection.find(query || {}, options);
+		return await this.collection.find(query || {}, options).toArray();
 	}
 
 	async findOne(query: Filter<CM>, options?: Omit<FindOneOptions, 'timeoutMode'>) {

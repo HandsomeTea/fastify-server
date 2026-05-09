@@ -1,4 +1,4 @@
-import { generateTraceId, trace } from '../configs/index.js';
+import { generateTraceId, trace } from '../configs/logger.js';
 import { contextStorage, getContext, type RequestContext } from './context.js';
 import type { FastifyPluginAsync } from 'fastify';
 import fp from 'fastify-plugin';
