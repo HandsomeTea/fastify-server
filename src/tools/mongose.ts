@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
-import { getEnv, system } from '../configs/index.js';
+import { getEnv } from '../configs/env.js';
+import { system } from '../configs/logger.js';
 import { protectedUrl } from '../utils/index.js';
 
 const RECONNET_TIME = 5000;
