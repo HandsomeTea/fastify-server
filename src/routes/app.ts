@@ -5,16 +5,23 @@ import Fastify from 'fastify';
  */
 export const app = Fastify({ logger: false });
 
-import { errorHook, requestHookPlugin, responseHook, userLoginCheck } from '../hooks/index.js';
+import { errorHandler, requestHookPlugin, sendHook, responseHook, userLoginCheck } from '../hooks/index.js';
 
-app.register(userLoginCheck);
-app.addHook('onError', errorHook);
-app.addHook('preHandler', async (request, reply) => await app.userLoginRequired(request, reply));
+/** 保存基础context */
 app.register(requestHookPlugin);
-app.addHook('onSend', responseHook);
+/** 鉴权 */
+app.addHook('preHandler', userLoginCheck);
+/** 错误处理 */
+app.setErrorHandler(errorHandler);
+/** 传递发送给客户端的数据用于日志记录 */
+app.addHook('onSend', sendHook);
+/** 情亲和响应日志记录 */
+app.addHook('onResponse', responseHook);
 
-import v1 from './v1/index.js';
 import healthyCheck from './healthy.js';
+import v1 from './v1/index.js';
 
+/** 健康检查接口 */
 app.register(healthyCheck);
+/** 接口定义 */
 app.register(v1, { prefix: '/api/usermanager/v1' });

@@ -1,22 +1,12 @@
 import { trace } from '../configs/logger.js';
 import { getContext } from './context.js';
-import type { onSendAsyncHookHandler } from 'fastify';
+import type { onResponseAsyncHookHandler, onSendAsyncHookHandler } from 'fastify';
 
+export const sendHook: onSendAsyncHookHandler = async (_request, reply, payload) => {
+	reply.responseBody = payload as string;
+}
 
-export const responseHook: onSendAsyncHookHandler = async (request, reply, payload) => {
-	let errPyload = null;
-
-
-	// @ts-ignore
-	if (reply.e) {
-
-		// @ts-ignore
-		const { code, message, status, reason, source } = reply.e as ExceptionInstance;
-
-		reply.status(status);
-		errPyload = { code, message, reason, source };
-	}
-
+export const responseHook: onResponseAsyncHookHandler = async (request, reply) => {
 	const ctx = getContext();
 
 	if (ctx) {
@@ -25,14 +15,23 @@ export const responseHook: onSendAsyncHookHandler = async (request, reply, paylo
 				traceId: ctx.traceId,
 				spanId: ctx.spanId,
 				parentSpanId: ctx.parentSpanId,
-				response: errPyload || JSON.parse(payload as string)
+				header: {
+					...request.headers,
+					...(request.headers.cookie ? { cookie: '******' } : {})
+				},
+				query: request.query || {},
+				body: request.body || {}
+			},
+			'HTTP-REQUEST'
+		).info(`[${request.method}] ${request.url}`);
+		trace(
+			{
+				traceId: ctx.traceId,
+				spanId: ctx.spanId,
+				parentSpanId: ctx.parentSpanId,
+				response: JSON.parse(reply.responseBody as string)
 			},
 			'HTTP-RESPONSE'
 		).info(`[${request.method}] ${request.url} =>`);
 	}
-
-	if (errPyload) {
-		return JSON.stringify(errPyload);
-	}
-	return payload;
 };

@@ -1,10 +1,9 @@
-import { generateTraceId, trace } from '../configs/logger.js';
-import { contextStorage, getContext, type RequestContext } from './context.js';
-import type { FastifyPluginAsync } from 'fastify';
+import { generateTraceId } from '../configs/logger.js';
+import { contextStorage, type RequestContext } from './context.js';
 import fp from 'fastify-plugin';
 
-const contextPlugin: FastifyPluginAsync = async (fastify) => {
-	fastify.addHook('onRequest', (request, reply, done) => {
+export const requestHookPlugin = fp(async (fastify) => {
+	fastify.addHook('preValidation', (request, _reply, done) => {
 		if (!request.headers['x-b3-traceid']) {
 			request.headers['x-b3-traceid'] = generateTraceId();
 		}
@@ -22,27 +21,7 @@ const contextPlugin: FastifyPluginAsync = async (fastify) => {
 		};
 
 		contextStorage.run(context, () => {
-			const ctx = getContext();
-
-			if (ctx) {
-				trace(
-					{
-						traceId: ctx.traceId,
-						spanId: ctx.spanId,
-						parentSpanId: ctx.parentSpanId,
-						header: {
-							...request.headers,
-							...(request.headers.cookie ? { cookie: '******' } : {})
-						},
-						query: request.query || {},
-						body: request.body || {}
-					},
-					'HTTP-REQUEST'
-				).info(`[${request.method}] ${request.url}`);
-			}
 			done();
 		});
 	});
-};
-
-export default fp(contextPlugin);
+});
