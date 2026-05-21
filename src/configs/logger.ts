@@ -57,6 +57,7 @@ export const trace = (
 		parentSpanId: string;
 		query?: unknown
 		body?: unknown
+		params?: unknown
 		header?: Record<string, unknown>;
 		response?: unknown;
 	},
