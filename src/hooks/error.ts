@@ -1,19 +1,20 @@
 import type { FastifyInstance } from 'fastify';
 import { ErrorCode } from '../configs/errorCode.js';
 
+type ValidationError = Error & { validation: Array<unknown> };
+type SerializationError = Error & { serialization: Array<unknown> };
+
 export const errorHandler: FastifyInstance['errorHandler'] = (error, _request, reply) => {
 	let exception = new Exception(`${error}`);
 
 	if (error instanceof Exception) {
 		exception = error;
-		// @ts-ignore
-	} else if (error.validation) {
-		const e = error as Error & { validation: Array<unknown> }
+	} else if ((error as ValidationError).validation) {
+		const e = error as ValidationError;
 
 		exception = new Exception(e.message, ErrorCode.INVALID_ARGUMENTS);
-		// @ts-ignore
-	} else if (error.serialization) {
-		const e = error as Error & { serialization: { url: string, method: string } }
+	} else if ((error as SerializationError).serialization) {
+		const e = error as SerializationError;
 
 		exception = new Exception(`response ${e.message}`);
 	}

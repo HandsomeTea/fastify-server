@@ -5,7 +5,7 @@ import type { ZodObject } from 'zod';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default class MongoBase<CM extends Record<string, any>> {
 	protected collectionName: string;
-	protected schema: ZodObject<CM>;
+	protected schema: ZodObject;
 
 	constructor(collectionName: string, schema: typeof this.schema) {
 		this.collectionName = collectionName;

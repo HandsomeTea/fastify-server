@@ -15,7 +15,4 @@ const developConfig: EnvConfigType = {
 	MONGO_URL: 'mongodb://admin:admin@localhost:27017/test?authSource=admin'
 };
 
-export const getEnv = <K extends keyof EnvConfigType>(env: K): EnvConfigType[K] => {
-	// @ts-ignore
-	return process.env[env] || developConfig[env];
-};
+export const getEnv = <K extends keyof EnvConfigType>(env: K): EnvConfigType[K] => process.env[env] as EnvConfigType[K] | undefined || developConfig[env];

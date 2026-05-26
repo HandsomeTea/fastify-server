@@ -12,14 +12,10 @@ export const HttpErrorType = {
 } as const;
 
 
-// @ts-ignore
-export const ErrorCode: { [K in keyof typeof HttpErrorType]: K } = {} as const;
-
-for (const key in HttpErrorType) {
-
-	// @ts-ignore
-	ErrorCode[key] = key;
-}
+export const ErrorCode = Object.keys(HttpErrorType).reduce((acc, key) => {
+	acc[key] = key;
+	return acc;
+}, {} as Record<string, string>) as { [K in keyof typeof HttpErrorType]: K };
 
 
 /**

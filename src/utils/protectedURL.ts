@@ -7,7 +7,6 @@ const _protectedUrl = (url: string) => {
 
         return address.toString();
     } catch (e) {
-        // @ts-ignore
         console.warn(e);
         return url;
     }
